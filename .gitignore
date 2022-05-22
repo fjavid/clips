@@ -1,2 +1,5 @@
 sim_chrono/outputs
 sim_chrono/build
+sim_chrono/.DS_Store
+/.vscode
+sim_chrono/.vscode
