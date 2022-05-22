@@ -1232,13 +1232,6 @@ int main(int argc, char* argv[])
     ParaVisual pvis("/home/project/clips/sim_chrono/outputs", "sys1", dT);
     while (chronoTime < endT) 
     {
-        // if (nframe % txt_interval == 0)
-        // {
-        //     ke = ComputeTotalKE(mphysicalSystem);
-        //     kin_eng << chronoTime << ", " << ke << std::endl;
-        // }
-        // std::vector<std::vector<double>> new_verts = csys.get_updated_location("open_clip", 3);
-        // std::cout << "frame is : " << new_verts.at(2).at(1) << std::endl;
         if (nframe % vtu_interval == 0)
         {
             nvtu++;
