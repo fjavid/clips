@@ -1,0 +1,250 @@
+{
+	"artifacts" : 
+	[
+		{
+			"path" : "clip"
+		}
+	],
+	"backtrace" : 1,
+	"backtraceGraph" : 
+	{
+		"commands" : 
+		[
+			"add_executable",
+			"set_target_properties",
+			"include_directories"
+		],
+		"files" : 
+		[
+			"CMakeLists.txt"
+		],
+		"nodes" : 
+		[
+			{
+				"file" : 0
+			},
+			{
+				"command" : 0,
+				"file" : 0,
+				"line" : 136,
+				"parent" : 0
+			},
+			{
+				"command" : 1,
+				"file" : 0,
+				"line" : 147,
+				"parent" : 0
+			},
+			{
+				"command" : 2,
+				"file" : 0,
+				"line" : 105,
+				"parent" : 0
+			}
+		]
+	},
+	"compileGroups" : 
+	[
+		{
+			"compileCommandFragments" : 
+			[
+				{
+					"fragment" : " "
+				},
+				{
+					"fragment" : " -std=c++14 -pthread -fopenmp  -march=native -msse4.2 -mfpmath=sse  -march=native -mavx2  -march=native -mfma    "
+				}
+			],
+			"defines" : 
+			[
+				{
+					"backtrace" : 2,
+					"define" : "CHRONO_DATA_DIR=\"/usr/share/chrono/data/\""
+				}
+			],
+			"includes" : 
+			[
+				{
+					"backtrace" : 3,
+					"path" : "/usr/include/chrono"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/usr/include/chrono/collision/bullet"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/usr/include/chrono/collision/gimpact"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/usr/include/chrono_thirdparty/HACD"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/usr/include/chrono_thirdparty/HACDv2"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/usr/include/eigen3"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/usr/include/irrlicht"
+				},
+				{
+					"backtrace" : 3,
+					"path" : "/usr/include/GLFW"
+				}
+			],
+			"language" : "CXX",
+			"sourceIndexes" : 
+			[
+				0
+			]
+		}
+	],
+	"id" : "clip::@6890427a1f51a3e7e1df",
+	"link" : 
+	{
+		"commandFragments" : 
+		[
+			{
+				"fragment" : "-L/usr/lib",
+				"role" : "flags"
+			},
+			{
+				"fragment" : "/usr/lib/gcc/x86_64-linux-gnu/9/libgomp.so",
+				"role" : "libraries"
+			},
+			{
+				"fragment" : "/usr/lib/x86_64-linux-gnu/libpthread.so",
+				"role" : "libraries"
+			},
+			{
+				"fragment" : "/usr/lib/x86_64-linux-gnu/libIrrlicht.so",
+				"role" : "libraries"
+			},
+			{
+				"fragment" : "-lXxf86vm",
+				"role" : "libraries"
+			},
+			{
+				"fragment" : "-lglut",
+				"role" : "libraries"
+			},
+			{
+				"fragment" : "-lX11",
+				"role" : "libraries"
+			},
+			{
+				"fragment" : "-lGL",
+				"role" : "libraries"
+			},
+			{
+				"fragment" : "/usr/lib/x86_64-linux-gnu/libGLEW.so",
+				"role" : "libraries"
+			},
+			{
+				"fragment" : "/usr/lib/x86_64-linux-gnu/libglfw.so",
+				"role" : "libraries"
+			},
+			{
+				"fragment" : "/usr/lib/libChronoEngine.so",
+				"role" : "libraries"
+			},
+			{
+				"fragment" : "/usr/lib/libChronoEngine_cosimulation.so",
+				"role" : "libraries"
+			},
+			{
+				"fragment" : "/usr/lib/libChronoEngine_irrlicht.so",
+				"role" : "libraries"
+			},
+			{
+				"fragment" : "/usr/lib/libChronoEngine_postprocess.so",
+				"role" : "libraries"
+			},
+			{
+				"fragment" : "/usr/lib/libChronoEngine_multicore.so",
+				"role" : "libraries"
+			},
+			{
+				"fragment" : "/usr/lib/libChronoEngine_cosimulation.so",
+				"role" : "libraries"
+			},
+			{
+				"fragment" : "/usr/lib/libChronoEngine_vehicle.so",
+				"role" : "libraries"
+			},
+			{
+				"fragment" : "/usr/lib/libChronoModels_vehicle.so",
+				"role" : "libraries"
+			},
+			{
+				"fragment" : "/usr/lib/libChronoEngine_vehicle_irrlicht.so",
+				"role" : "libraries"
+			},
+			{
+				"fragment" : "/usr/lib/libChronoEngine_opengl.so",
+				"role" : "libraries"
+			},
+			{
+				"fragment" : "/usr/lib/libChronoEngine_irrlicht.so",
+				"role" : "libraries"
+			},
+			{
+				"fragment" : "/usr/lib/libChronoEngine_postprocess.so",
+				"role" : "libraries"
+			},
+			{
+				"fragment" : "/usr/lib/libChronoEngine_multicore.so",
+				"role" : "libraries"
+			},
+			{
+				"fragment" : "/usr/lib/libChronoEngine_vehicle.so",
+				"role" : "libraries"
+			},
+			{
+				"fragment" : "/usr/lib/libChronoModels_vehicle.so",
+				"role" : "libraries"
+			},
+			{
+				"fragment" : "/usr/lib/libChronoEngine_vehicle_irrlicht.so",
+				"role" : "libraries"
+			},
+			{
+				"fragment" : "/usr/lib/libChronoEngine_opengl.so",
+				"role" : "libraries"
+			}
+		],
+		"language" : "CXX"
+	},
+	"name" : "clip",
+	"nameOnDisk" : "clip",
+	"paths" : 
+	{
+		"build" : ".",
+		"source" : "."
+	},
+	"sourceGroups" : 
+	[
+		{
+			"name" : "Source Files",
+			"sourceIndexes" : 
+			[
+				0
+			]
+		}
+	],
+	"sources" : 
+	[
+		{
+			"backtrace" : 1,
+			"compileGroupIndex" : 0,
+			"path" : "main.cpp",
+			"sourceGroupIndex" : 0
+		}
+	],
+	"type" : "EXECUTABLE"
+}

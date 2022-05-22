@@ -1,0 +1,44 @@
+<?xml version="1.0"?>
+<VTKFile type="UnstructuredGrid" byte_order="LittleEndian">
+<UnstructuredGrid>
+<Piece NumberOfPoints="10" NumberOfCells="5">
+<Points>
+<DataArray type="Float64" NumberOfComponents="3" Name="coordinates" format="ascii">
+-0.14449 -0.444977 -0.0429793
+-0.147518 -0.426133 -0.0469754
+-0.146376 -0.42694 -0.0467666
+-0.168094 -0.430448 -0.0468526
+-0.167262 -0.429322 -0.0470536
+-0.16074 -0.46991 -0.0384467
+-0.161882 -0.469103 -0.0386555
+-0.140164 -0.465595 -0.0385695
+-0.140996 -0.466721 -0.0383685
+-0.144024 -0.447876 -0.0423646
+</DataArray>
+</Points>
+<Cells>
+<DataArray type="Int32" NumberOfComponents="1" Name="connectivity" format="ascii">
+0 1
+2 3
+4 5
+6 7
+8 9
+</DataArray>
+<DataArray type="Int32" NumberOfComponents="1" Name="offsets" format="ascii">
+2
+4
+6
+8
+10
+</DataArray>
+<DataArray type="Int32" NumberOfComponents="1" Name="types" format="ascii">
+3
+3
+3
+3
+3
+</DataArray>
+</Cells>
+</Piece>
+</UnstructuredGrid>
+</VTKFile>
