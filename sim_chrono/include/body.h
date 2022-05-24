@@ -151,4 +151,63 @@ class Box : public Body
 
 };
 
+class Cylinder : public Body
+{
+    public:
+    Cylinder(){};
+    Cylinder(double _int_r, double _int_h, double _thick, bool _cap, double _density, double _friction, double _restitution)
+    : int_r(_int_r), int_h(_int_h), thick(_thick), cap(_cap), Body(_density, _friction, _restitution)
+    {
+        // Body(_density, _friction, _restitution);
+        vis_type = "face";
+        if (thick <= 0.0)
+        {
+            thick = 0.05*int_r;
+        }
+        
+        double volume_hollow_cyl = M_PI * ((int_r + thick) * (int_r + thick) - int_r * int_r) * int_h;
+        double volume_lcap = M_PI * (int_r + thick) * (int_r + thick) * thick;
+        double volume_rcap =  cap ? volume_lcap : 0.0;
+        double volume = volume_hollow_cyl + volume_lcap + volume_rcap;
+        double mass = den * volume;
+        double mass_hollow_cyl = den * volume_hollow_cyl;
+        double mass_lcap = den * volume_lcap;
+        double mass_rcap = den * volume_rcap;
+        inertia_xx = mass_hollow_cyl/12.0 * (3.0*(int_r*int_r + (int_r+thick)*(int_r+thick)) + int_h*int_h)+
+                     0.25 * mass_lcap * (int_r+thick)*(int_r+thick) + mass_lcap * (0.5*(int_h + thick)) * (0.5*(int_h + thick))+
+                     0.25 * mass_rcap * (int_r+thick)*(int_r+thick) + mass_rcap * (0.5*(int_h + thick)) * (0.5*(int_h + thick));
+        inertia_yy = 0.5 * mass_hollow_cyl * (int_r*int_r + (int_r+thick)*(int_r+thick))+
+                     0.5 * mass_lcap * (int_r+thick)*(int_r+thick)+
+                     0.5 * mass_rcap * (int_r+thick)*(int_r+thick);
+        inertia_zz = mass_hollow_cyl/12.0 * (3.0*(int_r*int_r + (int_r+thick)*(int_r+thick)) + int_h*int_h)+
+                     0.25 * mass_lcap * (int_r+thick)*(int_r+thick) + mass_lcap * (0.5*(int_h + thick)) * (0.5*(int_h + thick))+
+                     0.25 * mass_rcap * (int_r+thick)*(int_r+thick) + mass_rcap * (0.5*(int_h + thick)) * (0.5*(int_h + thick));
+        
+        vertices.push_back(std::vector<double>({0.0, -0.5*int_h, 0.0}));
+        for (int ni=0; ni<p_res; ni++)
+        {
+            double theta = 2.0*M_PI*ni/p_res;
+            vertices.push_back(std::vector<double>({int_r*cos(theta), -0.5*int_h, int_r*sin(theta)}));
+            vertices.push_back(std::vector<double>({int_r*cos(theta), 0.5*int_h, int_r*sin(theta)}));
+        }
+        if (cap)
+            vertices.push_back(std::vector<double>({0.0, 0.5*int_h, 0.0}));
+        
+        for (int ne=0; ne<p_res; ne++)
+        {
+            elems.push_back(std::vector<int>({0, 2*ne+1, ne==p_res-1 ? 1 : 2*ne+3}));
+            elems.push_back(std::vector<int>({2*ne+1, 2*ne+2, ne==p_res-1 ? 1 : 2*ne+3}));
+            elems.push_back(std::vector<int>({2*ne+2, ne==p_res-1 ? 1 : 2*ne+3, ne==p_res-1 ? 2 : 2*ne+4}));
+            if (cap)
+                elems.push_back(std::vector<int>({2*p_res+1, 2*ne+2, ne==p_res-1 ? 2 : 2*ne+4}));
+        }
+        
+    }
+    double int_r;
+    double int_h;
+    double thick;
+    bool cap;
+    int p_res = 32;
+};
+
 #endif

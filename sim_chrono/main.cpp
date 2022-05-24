@@ -11,6 +11,7 @@
 #include "chrono_multicore/physics/ChSystemMulticore.h"
 
 #include "include/visualize.h"
+#include "include/body.h"
 
 // #define PICOPARAVIEW_IMPLEMENTATION
 // #include "include/picoparaview.h"
@@ -1158,7 +1159,7 @@ float ComputeTotalKE(ChSystemMulticoreNSC &sys)
 int main(int argc, char* argv[]) 
 {
     GetLog() << "Copyright (c) 2017 projectchrono.org\nChrono version: " << CHRONO_VERSION << "\n\n";
-    int num_of_threads = 1;
+    int num_of_threads = 6;
     int num_of_clips = 6;
     // std::string type_of_clips = "closed";
 
@@ -1173,31 +1174,40 @@ int main(int argc, char* argv[])
     double clip_r = 0.001;
     double clip_g = 0.003;
     double clip_density = 4000.0;
-    double clip_fric = 0.1;
+    double clip_fric = 0.05;
     double clip_rest = 0.5;
     std::string clip_name = "open_clip";
     ChVector<> clip_center(0.0, 0.0, 0.0);
     
     csys.make_clip(clip_h, clip_w, clip_r, clip_g, 0.0, clip_density, clip_fric, clip_rest, clip_name);
-    ChVector<> dim(0.25, 0.15, 0.1);
+    ChVector<> dim(0.3, 0.2, 0.15);
     ChVector<> center(0.0, 0.0, 0.0);
     double b_den = 7800.0;
-    double b_fric = 0.2;
+    double b_fric = 0.05;
     double b_rest = 0.4;
     std::string box_name = "box";
     csys.make_box(dim.x(), dim.y(), dim.z(), 0.02, b_den, b_fric, b_rest, "box");
+    std::string cylin_name = "cylin";
+    double cylin_r = 0.1;
+    double cylin_h = 0.2;
+    double cylin_thick = 0.02;
+    csys.make_cylinder(cylin_r, cylin_h, cylin_thick, true, b_den, b_fric, b_rest, cylin_name);
 
-    int num_clip = 5;
+    int num_clip = 200;
     double box_wall_t = 0.02;
     csys.add_floor(ChVector<>(0.1, 0.001, 0.1), ChVector<>(0.0, 0.0, 0.0), 1);
-    csys.add_box(box_name, 2, center, QUNIT);
-    csys.add_motion("box_2", "floor_1", "vibration", ChVector<>(0, 0, 0), ChVector<>(2, 3, 4), ChVector<>(0.005, 0.008, 0.01));
+    // csys.add_box(box_name, 2, center, QUNIT);
+    csys.add_cylinder(cylin_name, 2, center, Q_ROTATE_Y_TO_X);
+    csys.add_motion("cylin_2", "floor_1", "rotation", ChVector<>(0, 0, 0), ChVector<>(2, 3, 4), ChVector<>(0.01, 0.02, 0.0));
+    // csys.add_motion("box_2", "floor_1", "rotation", ChVector<>(0, 0, 0), ChVector<>(2, 3, 4), ChVector<>(0.005, 0.008, 0.01));
     csys.add_clip(clip_name, 3, clip_center, QUNIT);
+    ChVector<> cen2 = clip_center+ChVector<>(0.11, 0.0, 0.0);
+    csys.add_clip(clip_name, 3, cen2, QUNIT);
     
-    csys.clip_in_box(dim, center, num_clip, 0.01, clip_name);
+    // csys.clip_in_box(dim, center, num_clip, 0.01, clip_name);
     std::cout << "num of bodies : " << csys.n_body << std::endl;
 
-    int max_iteration = 200;
+    int max_iteration = 250;
     double tolerance = 1e-7;
     csys.sys->GetSettings()->solver.solver_type = SolverType::APGD;
     // csys.sys->GetSettings()->solver.solver_mode = SolverMode::SLIDING;
@@ -1212,9 +1222,9 @@ int main(int argc, char* argv[])
     // mphysicalSystem.ChangeSolverType(SolverType::APGDREF);
 
 
-    double dT = 0.005;
-    double endT = 2.0;
-    int vtu_interval = 10; //1./dT / 20.0 < 1 ? 1 : (int) 1./dT / 100.0;
+    double dT = 0.0025;
+    double endT = 1.0;
+    int vtu_interval = 20; //1./dT / 20.0 < 1 ? 1 : (int) 1./dT / 100.0;
     int txt_interval = 1./dT / 100.0 < 1 ? 1 : (int) 1./dT / 100.0;
     // GetLog() << "  List of bodies: " << mphysicalSystem.Get_bodylist()[4]->GetCoord().pos.x() << "\n";
     csys.sys->SetMaxPenetrationRecoverySpeed(10.0);
@@ -1229,7 +1239,10 @@ int main(int argc, char* argv[])
     double start = std::clock();
     // double ke = ComputeTotalKE(mphysicalSystem);
     // kin_eng << chronoTime << ", " << ke << std::endl;
+    
     ParaVisual pvis("/home/project/clips/sim_chrono/outputs", "sys1", dT);
+    // Cylinder cyl(0.1, 0.8, 0.05, true, 1000, 0.1, 0.4);
+    // pvis.write_face_obj(cyl.vertices, cyl.elems, "cylin", 1, 1);
     while (chronoTime < endT) 
     {
         if (nframe % vtu_interval == 0)
@@ -1250,6 +1263,13 @@ int main(int argc, char* argv[])
                     std::vector<std::vector<double>> verts = csys.get_updated_location(box_name, gid);
                     // std::cout << "sample vert : " << verts[0].at(0) << " , " << verts[0].at(1) << " , " << verts[0].at(2) << std::endl;
                     pvis.write_face_obj(verts, csys.bodies[box_name]->elems, "box", gid, nframe);
+                }
+                if (bname.substr(0, cylin_name.size()) == cylin_name)
+                {
+                    int gid = body->GetGid();
+                    std::vector<std::vector<double>> verts = csys.get_updated_location(cylin_name, gid);
+                    // std::cout << "sample vert : " << verts[0].at(0) << " , " << verts[0].at(1) << " , " << verts[0].at(2) << std::endl;
+                    pvis.write_face_obj(verts, csys.bodies[cylin_name]->elems, "cylin", gid, nframe);
                 }
                 
                     

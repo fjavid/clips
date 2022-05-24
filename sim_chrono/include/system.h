@@ -12,6 +12,8 @@
 #include "utils/ChUtilsInputOutput.h"
 #include "utils/ChUtilsGenerators.h"
 #include "chrono_multicore/physics/ChSystemMulticore.h"
+// #include "chrono_multicore/collision/ChCollisionSystemChronoMulticore.h"
+#include "chrono/physics/ChLinkMotorRotationAngle.h"
 
 #include "body.h"
 #include <random>
@@ -54,6 +56,15 @@ class ClipSystem
             std::cout << "clip name " << name << " already exists. It will be modified to the new properties provided here! \n";
         // Clip clp = Clip(heigth, width, rad, gap, f_r, density, friction, restitution);
         bodies.insert(std::make_pair(name, std::make_shared<Clip>(heigth, width, rad, gap, f_r, density, friction, restitution)) );
+        return 1;
+    }
+
+    int make_cylinder(double int_r, double int_h, double thick, bool cap, double density, double friction, double restitution, std::string name)
+    {
+        if (bodies.find(name) != bodies.end())
+            std::cout << "cylinder name " << name << " already exists. It will be modified to the new properties provided here! \n";
+        // Clip clp = Clip(heigth, width, rad, gap, f_r, density, friction, restitution);
+        bodies.insert(std::make_pair(name, std::make_shared<Cylinder>(int_r, int_h, thick, cap, density, friction, restitution)) );
         return 1;
     }
 
@@ -103,8 +114,8 @@ class ClipSystem
         auto box = std::shared_ptr<ChBody>(sys->NewBody());
         box->GetCollisionModel()->ClearModel();
         box->SetCollide(true);
-        box->GetCollisionModel()->SetDefaultSuggestedEnvelope(envelope);
-        box->GetCollisionModel()->SetDefaultSuggestedMargin(margin);
+        box->GetCollisionModel()->SetDefaultSuggestedEnvelope(bx->envelope);
+        box->GetCollisionModel()->SetDefaultSuggestedMargin(bx->margin);
         // std::cout << dim << std::endl;
         // std::cout << "thickness : " <<  wall_t  << "\n dims : " << dim.x() << ", " << dim.y() << ", " << dim.z() <<  std::endl;
         double wall_t = bx->thick;
@@ -112,14 +123,14 @@ class ClipSystem
         double int_y = bx->int_y;
         double int_z = bx->int_z;
         // x-normal
-        box->GetCollisionModel()->AddBox(box_mat, 0.5*wall_t, 0.5*int_y+wall_t, 0.5*int_z+wall_t, center+ChVector<>(0.5*(int_x+wall_t), 0.0, 0.0), QUNIT);
-        box->GetCollisionModel()->AddBox(box_mat, 0.5*wall_t, 0.5*int_y+wall_t, 0.5*int_z+wall_t, center+ChVector<>(-0.5*(int_x+wall_t), 0.0, 0.0), QUNIT);
+        box->GetCollisionModel()->AddBox(box_mat, 0.5*wall_t, 0.5*int_y+wall_t, 0.5*int_z+wall_t, ChVector<>(0.5*(int_x+wall_t), 0.0, 0.0), QUNIT);
+        box->GetCollisionModel()->AddBox(box_mat, 0.5*wall_t, 0.5*int_y+wall_t, 0.5*int_z+wall_t, ChVector<>(-0.5*(int_x+wall_t), 0.0, 0.0), QUNIT);
         // y-normal
-        box->GetCollisionModel()->AddBox(box_mat, 0.5*int_x+wall_t, 0.5*wall_t, 0.5*int_z+wall_t, center+ChVector<>(0.0, 0.5*(int_y+wall_t), 0.0), QUNIT);
-        box->GetCollisionModel()->AddBox(box_mat, 0.5*int_x+wall_t, 0.5*wall_t, 0.5*int_z+wall_t, center+ChVector<>(0.0, -0.5*(int_y+wall_t), 0.0), QUNIT);
+        box->GetCollisionModel()->AddBox(box_mat, 0.5*int_x+wall_t, 0.5*wall_t, 0.5*int_z+wall_t, ChVector<>(0.0, 0.5*(int_y+wall_t), 0.0), QUNIT);
+        box->GetCollisionModel()->AddBox(box_mat, 0.5*int_x+wall_t, 0.5*wall_t, 0.5*int_z+wall_t, ChVector<>(0.0, -0.5*(int_y+wall_t), 0.0), QUNIT);
         // z-normal
-        box->GetCollisionModel()->AddBox(box_mat, 0.5*int_x+wall_t, 0.5*int_y+wall_t, 0.5*wall_t, center+ChVector<>(0.0, 0.0, 0.5*(int_z+wall_t)), QUNIT);
-        box->GetCollisionModel()->AddBox(box_mat, 0.5*int_x+wall_t, 0.5*int_y+wall_t, 0.5*wall_t, center+ChVector<>(0.0, 0.0, -0.5*(int_z+wall_t)), QUNIT);
+        box->GetCollisionModel()->AddBox(box_mat, 0.5*int_x+wall_t, 0.5*int_y+wall_t, 0.5*wall_t, ChVector<>(0.0, 0.0, 0.5*(int_z+wall_t)), QUNIT);
+        box->GetCollisionModel()->AddBox(box_mat, 0.5*int_x+wall_t, 0.5*int_y+wall_t, 0.5*wall_t, ChVector<>(0.0, 0.0, -0.5*(int_z+wall_t)), QUNIT);
         
         // double volume_out = (int_x+2.*wall_t) * (int_y+2.*wall_t) * (int_z+2.*wall_t);
         // double volume_in = int_x * int_y * int_z;
@@ -135,7 +146,8 @@ class ClipSystem
         //                     - mass_in/12.0 * (dim.y()*dim.y() + dim.x()*dim.x());
         box->SetMass(bx->mass);
         box->SetInertia(ChMatrix33<>(ChVector<>(bx->inertia_xx, bx->inertia_yy, bx->inertia_zz)));
-        
+        box->SetPos(center);
+        box->SetRot(rot);
         if (gids.find(gid) != gids.end())
         {
             int new_gid = *gids.rbegin() + 1;
@@ -149,6 +161,60 @@ class ClipSystem
         // box->SetBodyFixed(true);
         box->GetCollisionModel()->BuildModel();
         sys->Add(box);
+        n_body++;
+        return 1;
+    }
+
+    int add_cylinder(std::string name, int gid, ChVector<>& center, const ChQuaternion<double>& rot)
+    {
+        auto cylin_mat = chrono_types::make_shared<ChMaterialSurfaceNSC>();
+        std::shared_ptr<Cylinder> cln = std::dynamic_pointer_cast<Cylinder>(bodies[name]);
+        cylin_mat->SetFriction(cln->fric);
+        cylin_mat->SetRestitution(cln->rest);
+
+        auto cylin = std::shared_ptr<ChBody>(sys->NewBody());
+        cylin->GetCollisionModel()->ClearModel();
+        cylin->SetCollide(true);
+        cylin->GetCollisionModel()->SetDefaultSuggestedEnvelope(cln->envelope);
+        cylin->GetCollisionModel()->SetDefaultSuggestedMargin(cln->margin);
+        // std::cout << dim << std::endl;
+        // std::cout << "thickness : " <<  wall_t  << "\n dims : " << dim.x() << ", " << dim.y() << ", " << dim.z() <<  std::endl;
+        double thick = cln->thick;
+        double int_r = cln->int_r;
+        double int_h = cln->int_h;
+        
+        // cylin->GetCollisionModel()->AddCylindricalShell(cylin_mat, int_r, 0.5*int_h, center, QUNIT);
+        double sec_z = 2.0*M_PI * int_r / cln->p_res + thick;
+        for (int ni=0; ni<cln->p_res; ni++)
+        {
+            double theta = 2.0*M_PI * (ni+0.5) / cln->p_res;
+            ChVector<> sec_cen((int_r+0.5*thick)*cos(theta), 0.0, (int_r+0.5*thick)*sin(theta));
+            ChQuaternion<> sec_q;
+            sec_q.Q_from_AngAxis(-theta, ChVector<>(0.0, 1.0, 0.0));
+            cylin->GetCollisionModel()->AddBox(cylin_mat, 0.5*thick, 0.5*int_h, 0.5*sec_z, sec_cen, sec_q);
+        }
+        cylin->GetCollisionModel()->AddCylinder(cylin_mat, int_r, int_r, 0.5*thick, ChVector<>(0.0, -0.5*(int_h+thick), 0.0), QUNIT);
+        if (cln->cap)
+            cylin->GetCollisionModel()->AddCylinder(cylin_mat, int_r, int_r, 0.5*thick, ChVector<>(0.0, +0.5*(int_h+thick), 0.0), QUNIT);
+        
+        cylin->SetMass(cln->mass);
+        cylin->SetInertia(ChMatrix33<>(ChVector<>(cln->inertia_xx, cln->inertia_yy, cln->inertia_zz)));
+        cylin->SetPos(center);
+        cylin->SetRot(rot);
+        
+        if (gids.find(gid) != gids.end())
+        {
+            int new_gid = *gids.rbegin() + 1;
+            std::cout << "the body gid " << gid << " is already exist. The code assigns " << new_gid << " to the new body!\n";
+            gid = new_gid;
+        }
+        gids.insert(gid);
+        std::string bname = name_it("cylin", gid);
+        cylin->SetName(bname.c_str());
+        cylin->SetGid(gid);
+        // box->SetBodyFixed(true);
+        cylin->GetCollisionModel()->BuildModel();
+        sys->Add(cylin);
         n_body++;
         return 1;
     }
@@ -350,11 +416,12 @@ class ClipSystem
         auto moving = sys->SearchBody(bname_m.c_str());
         auto fixed = sys->SearchBody(bname_f.c_str());
 
-        auto motion = chrono_types::make_shared<ChLinkLockLock>();
-        motion->Initialize(moving , fixed, ChCoordsys<>(ChVector<>(0, 0, 0)));
+        
 
         if (type=="vibration")
         {
+            auto motion = chrono_types::make_shared<ChLinkLockLock>();
+            motion->Initialize(moving , fixed, ChCoordsys<>(ChVector<>(0, 0, 0)));
             auto mmotion_x = chrono_types::make_shared<ChFunction_Sine>(phase.x(), freq.x(), amp.x());  // phase freq ampl
             motion->SetMotion_X(mmotion_x);
             auto mmotion_y = chrono_types::make_shared<ChFunction_Sine>(phase.y(), freq.y(), amp.y());  // phase freq ampl
@@ -362,6 +429,14 @@ class ClipSystem
             auto mmotion_z = chrono_types::make_shared<ChFunction_Sine>(phase.z(), freq.z(), amp.z());  // phase freq ampl
             motion->SetMotion_Z(mmotion_z);
             sys->Add(motion);
+        }
+        else if (type=="rotation")
+        {
+            // Create a motor between the two bodies, constrained to rotate at 90 deg/s
+            auto motor = chrono_types::make_shared<ChLinkMotorRotationAngle>();
+            motor->Initialize(moving, fixed, ChFrame<>(ChVector<>(0, 0, 0), Q_ROTATE_X_TO_Z));
+            motor->SetAngleFunction(chrono_types::make_shared<ChFunction_Ramp>(0, 10.0));
+            sys->AddLink(motor);
         }
     }
     
